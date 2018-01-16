@@ -4,10 +4,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "sessions")
-public class UserSession {
+public class UserSession implements Serializable {
+
+    private static final long serialVersionUID = -5830776215730521393L;
 
     @Id
     @Column(name = "id")

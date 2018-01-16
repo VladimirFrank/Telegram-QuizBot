@@ -14,6 +14,8 @@
 
         <property name="hibernate.hbm2ddl.auto">update</property>
 
+        <property name="hibernate.current_session_context_class">thread</property>
+
         <mapping class="ru.frank.model.UserSession"/>
     </session-factory>
 </hibernate-configuration>
