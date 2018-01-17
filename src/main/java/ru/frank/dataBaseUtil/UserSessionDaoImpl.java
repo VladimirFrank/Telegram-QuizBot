@@ -11,9 +11,6 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import java.util.List;
 
-/**
- * Created by sbt-filippov-vv on 16.01.2018.
- */
 public class UserSessionDaoImpl implements UserSessionDao{
 
 //    Session session = HibernateSessionFactory.getSessionFactory().openSession();
@@ -51,12 +48,21 @@ public class UserSessionDaoImpl implements UserSessionDao{
     }
 
     @Override
-    public void update(long id, UserSession userSession) {
-
+    public void update(long id, UserSession userSessionNew) {
+        session.beginTransaction();
+        UserSession userSession = session.byId(UserSession.class).load(id);
+        userSession.setStartTime(userSessionNew.getStartTime());
+        userSession.setQuestion(userSessionNew.getQuestion());
+        userSession.setAnswer(userSessionNew.getAnswer());
+        session.update(userSession);
+        session.getTransaction().commit();
     }
 
     @Override
     public void delete(long id) {
-
+        session.beginTransaction();
+        UserSession userSession = session.byId(UserSession.class).load(id);
+        session.delete(userSession);
+        session.getTransaction().commit();
     }
 }

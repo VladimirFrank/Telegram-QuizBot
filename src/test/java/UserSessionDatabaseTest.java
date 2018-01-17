@@ -13,9 +13,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
-/**
- * Created by sbt-filippov-vv on 15.01.2018.
- */
 public class UserSessionDatabaseTest {
 
     private UserSessionDao userSessionDao = new UserSessionDaoImpl();
@@ -66,5 +63,16 @@ public class UserSessionDatabaseTest {
         for(UserSession userSession : userSessionList){
             System.out.println(userSession.toString());
         }
+    }
+
+    @Test
+    public void updateUserSessionTest(){
+        UserSession userSession = new UserSession((long) 521, "15:20:20", "Say my name!","Holmes.");
+        userSessionDao.update((555), userSession);
+    }
+
+    @Test
+    public void deleteUserSessionTest(){
+        userSessionDao.delete(555);
     }
 }
