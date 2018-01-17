@@ -17,5 +17,6 @@
         <property name="hibernate.current_session_context_class">thread</property>
 
         <mapping class="ru.frank.model.UserSession"/>
+        <mapping class="ru.frank.model.QuestionAndAnswer"/>
     </session-factory>
 </hibernate-configuration>

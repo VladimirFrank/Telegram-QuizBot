@@ -3,6 +3,7 @@ package ru.frank.dataBaseUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import org.springframework.stereotype.Component;
 import ru.frank.model.UserSession;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -11,12 +12,12 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import java.util.List;
 
+@Component
 public class UserSessionDaoImpl implements UserSessionDao{
 
 //    Session session = HibernateSessionFactory.getSessionFactory().openSession();
     Session session = HibernateSessionFactory.getSessionFactory().getCurrentSession();
 
-    @Transactional
     @Override
     public long save(UserSession userSession) {
         session.beginTransaction();
@@ -25,7 +26,6 @@ public class UserSessionDaoImpl implements UserSessionDao{
         return userSession.getId();
     }
 
-    @Transactional
     @Override
     public UserSession get(long id) {
         session.beginTransaction();
