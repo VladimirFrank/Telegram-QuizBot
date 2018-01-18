@@ -20,7 +20,7 @@ public class QuestionAnswerGenerator {
      * @return (long) [1 ; max ID]
      */
     private long getRandomNumber(){
-        return (long) (Math.random() * questionAndAnswerDao.getRowCount() + 1);
+        return (long) (Math.random() * questionAndAnswerDao.getMaximumId() + 1);
     }
 
     /**
