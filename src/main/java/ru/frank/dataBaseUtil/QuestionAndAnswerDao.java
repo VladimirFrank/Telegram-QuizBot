@@ -10,5 +10,7 @@ public interface QuestionAndAnswerDao {
 
     long getRowCount();
 
+    long getMaximumId();
+
 
 }

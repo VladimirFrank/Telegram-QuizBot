@@ -20,8 +20,14 @@ public class QuestionAndAnswerDatabaseTest {
     @Test
     public void getRowCoungTest(){
         long rowCount = questionAndAnswerDao.getRowCount();
-        System.out.println(rowCount);
-        Assert.assertTrue(rowCount == 3);
+        System.out.println("-----------\n" + rowCount + "\n-----------");
+        Assert.assertTrue(rowCount == 6);
+    }
 
+    @Test
+    public void getMaximumIdTest(){
+        long maximumId = questionAndAnswerDao.getMaximumId();
+        System.out.println("-----------\n" + maximumId + "\n-----------" );
+        Assert.assertTrue(maximumId == 7);
     }
 }
