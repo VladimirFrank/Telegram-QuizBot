@@ -1,0 +1,45 @@
+RussianQuiz.db
+
+Таблица Сессии пользователей
+sessions
+id (пользователя)| startTime | question | answer     |
+xx | 10:20:35  | XXXX?    | Y,Y2,Y3... |
+
+CREATE TABLE sessions (
+	id INTEGER PRIMARY KEY,
+	startTime VARCHAR(50),
+	question VARCHAR(50),
+	answer VARCHAR(50));
+	
+INSERT INTO sessions (id, startTime, question, answer) 
+	VALUES (100500, '17:04:50', 'Кто проживает на дне океана?', 'спанж боб');
+	
+INSERT INTO sessions (id, startTime, question, answer) 
+	VALUES (245670, '17:04:40', 'Сколько лет Пугачевой?', '642');
+	
+INSERT INTO sessions (id, startTime, question, answer) 
+	VALUES (52145, '17:25:00', 'Какой расстояние до Луны?', '100500');
+	
+Таблица Вопросы
+
+id (вопроса) | question | answer      |
+NN           | XXX?     | X1,X2,X3... |
+
+	CREATE TABLE questions (
+	id INTEGER PRIMARY KEY,
+	question VARCHAR(50),
+	answer VARCHAR(50));
+	
+	
+INSERT INTO questions (question, answer) VALUES ('В каком году началась Первая мировая война?', '1914');
+INSERT INTO questions (question, answer) VALUES ('Кто был первым императором Российской империи?', 'Петр Первый, Петр 1, Петр');
+INSERT INTO questions (question, answer) VALUES ('В каком городе родился Сократ?', 'Афины');
+
+INSERT INTO questions (question, answer) VALUES ('Столица Цехии?', 'Прага');	
+
+
+INSERT INTO questions (question, answer) VALUES ('Столица Словении?', 'Люблюна');	
+INSERT INTO questions (question, answer) VALUES ('Столица Черногории?', 'Подгорица');	
+INSERT INTO questions (question, answer) VALUES ('Столица Албании?', 'Тирана');	
+
+	
