@@ -8,13 +8,15 @@
         <property name="format_sql">true</property>
         <property name="dialect">ru.frank.dialect.SQLite.SQLiteDialect</property>
         <property name="connection.driver_class">org.sqlite.JDBC</property>
-        <property name="connection.url">jdbc:sqlite:E:\\sqLite\\RussianQuiz.db</property>
+        <property name="connection.url">jdbc:sqlite:F:\JavaProjects\RussianQuizBotSQLite\src\main\resources\sqLite\RussianQuiz.db</property>
         <property name="connection.username"></property>
         <property name="connection.password"></property>
 
         <property name="hibernate.hbm2ddl.auto">update</property>
 
-        <property name="hibernate.current_session_context_class">thread</property>
+        <property name="hibernate.connection.release_mode">auto</property>
+        <property name="current_session_context_class">thread</property>
+        <property name="hibernate.connection.autoReconnect">true</property>
 
         <mapping class="ru.frank.model.UserSession"/>
         <mapping class="ru.frank.model.QuestionAndAnswer"/>

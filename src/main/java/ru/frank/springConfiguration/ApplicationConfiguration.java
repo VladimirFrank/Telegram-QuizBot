@@ -2,6 +2,7 @@ package ru.frank.springConfiguration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.telegram.telegrambots.TelegramBotsApi;
 import ru.frank.bot.botUtils.QuestionAnswerGenerator;
 import ru.frank.bot.botUtils.UserSessionHandler;
 import ru.frank.dataBaseUtil.QuestionAndAnswerDao;
@@ -30,5 +31,10 @@ public class ApplicationConfiguration {
     @Bean
     public QuestionAnswerGenerator questionAnswerGenerator(){
         return new QuestionAnswerGenerator();
+    }
+
+    @Bean
+    public TelegramBotsApi telegramBotsApi(){
+        return new TelegramBotsApi();
     }
 }
