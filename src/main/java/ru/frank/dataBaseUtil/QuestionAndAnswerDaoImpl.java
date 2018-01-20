@@ -1,60 +1,39 @@
 package ru.frank.dataBaseUtil;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Projection;
+import org.springframework.stereotype.Repository;
 import ru.frank.model.QuestionAndAnswer;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.List;
 
-/**
- * Created by sbt-filippov-vv on 17.01.2018.
- */
-public class QuestionAndAnswerDaoImpl implements QuestionAndAnswerDao {
+@Repository
+@Transactional
+public class QuestionAndAnswerDaoImpl implements QuestionAndAnswerDao{
 
-
-    Session session = HibernateSessionFactory.getSessionFactory().getCurrentSession();
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public QuestionAndAnswer get(long id) {
-        session.beginTransaction();
-        QuestionAndAnswer questionAndAnswer = session.get(QuestionAndAnswer.class, id);
-        session.getTransaction().commit();
-        return questionAndAnswer;
+        return entityManager.find(QuestionAndAnswer.class, id);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<QuestionAndAnswer> getAll() {
+        return entityManager.createQuery("from QuestionAndAnswer ").getResultList();
     }
 
     @Override
     public long getRowCount() {
-        session.beginTransaction();
-        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-        CriteriaQuery<QuestionAndAnswer> criteria = criteriaBuilder.createQuery(QuestionAndAnswer.class);
-
-        criteria.from(QuestionAndAnswer.class);
-
-        Long count = (long) session.createQuery(criteria).getResultList().size();
-        session.getTransaction().commit();
-        return count;
+        return getAll().size();
     }
 
     @Override
     public long getMaximumId() {
-        session.beginTransaction();
-        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-        CriteriaQuery<QuestionAndAnswer> criteria = criteriaBuilder.createQuery(QuestionAndAnswer.class);
-
-        criteria.from(QuestionAndAnswer.class);
-
-        List<QuestionAndAnswer> questionAndAnswerList = session.createQuery(criteria).getResultList();
-
-        long maximumId = 0;
-        if(questionAndAnswerList != null && !questionAndAnswerList.isEmpty()){
-            maximumId = questionAndAnswerList.get(questionAndAnswerList.size() - 1).getId();
-        }
-        session.getTransaction().commit();
-        return maximumId;
-
-
+        List<QuestionAndAnswer> questionAndAnswersList = getAll();
+        return questionAndAnswersList.get(questionAndAnswersList.size() - 1).getId();
     }
 }

@@ -71,8 +71,8 @@ public class UserSessionDatabaseTest {
         userSessionDao.update((555), userSession);
     }
 
-    @Test
-    public void deleteUserSessionTest(){
-        userSessionDao.delete(555);
-    }
+//    @Test
+//    public void deleteUserSessionTest(){
+//        userSessionDao.delete(555);
+//    }
 }

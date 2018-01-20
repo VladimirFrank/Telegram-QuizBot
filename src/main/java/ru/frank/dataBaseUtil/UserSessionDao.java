@@ -14,7 +14,7 @@ public interface UserSessionDao {
 
     void update(long id, UserSession userSession);
 
-    void delete(long id);
+    void delete(UserSession userSession);
 
 
 }

@@ -1,68 +1,48 @@
 package ru.frank.dataBaseUtil;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.frank.model.UserSession;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.List;
 
-@Component
-public class UserSessionDaoImpl implements UserSessionDao{
+@Repository
+@Transactional
+public class UserSessionDaoImpl implements UserSessionDao {
 
-//    Session session = HibernateSessionFactory.getSessionFactory().openSession();
-    Session session = HibernateSessionFactory.getSessionFactory().getCurrentSession();
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Override
     public long save(UserSession userSession) {
-        session.beginTransaction();
-        session.saveOrUpdate(userSession);
-        session.getTransaction().commit();
+        entityManager.persist(userSession);
         return userSession.getId();
     }
 
     @Override
     public UserSession get(long id) {
-        session.beginTransaction();
-        UserSession userSession = session.get(UserSession.class, id);
-        session.getTransaction().commit();
-        return userSession;
+        return entityManager.find(UserSession.class, id);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<UserSession> list() {
-        session.beginTransaction();
-        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-        CriteriaQuery<UserSession> criteriaQuery = criteriaBuilder.createQuery(UserSession.class);
-        Root<UserSession> root = criteriaQuery.from(UserSession.class);
-        criteriaQuery.select(root);
-        Query<UserSession> query = session.createQuery(criteriaQuery);
-        List<UserSession> resultList = query.getResultList();
-        session.getTransaction().commit();
-        return resultList;
+        return entityManager.createQuery("from UserSession ").getResultList();
     }
 
     @Override
-    public void update(long id, UserSession userSessionNew) {
-        session.beginTransaction();
-        UserSession userSession = session.byId(UserSession.class).load(id);
-        userSession.setStartTime(userSessionNew.getStartTime());
-        userSession.setQuestion(userSessionNew.getQuestion());
-        userSession.setAnswer(userSessionNew.getAnswer());
-        session.update(userSession);
-        session.getTransaction().commit();
+    public void update(long id, UserSession userSession) {
+        entityManager.persist(userSession);
     }
 
     @Override
-    public void delete(long id) {
-        session.beginTransaction();
-        UserSession userSession = session.byId(UserSession.class).load(id);
-        session.delete(userSession);
-        session.getTransaction().commit();
+    public void delete(UserSession userSession) {
+        if(entityManager.contains(userSession)){
+            entityManager.remove(userSession);
+        } else{
+            entityManager.remove(entityManager.merge(userSession));
+        }
     }
 }
