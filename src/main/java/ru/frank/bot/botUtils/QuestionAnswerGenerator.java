@@ -40,7 +40,7 @@ public class QuestionAnswerGenerator {
         return questionAndAnswer;
     }
 
-    public String getNewQuestionForUser(){
+    public String getNewQuestionAndAnswerForUser(){
         StringBuilder sb = new StringBuilder();
         QuestionAndAnswer questionAndAnswer = getRandomQuestionAndAnswer();
         sb.append(questionAndAnswer.getQuestion()).append("|").append(questionAndAnswer.getAnswer());

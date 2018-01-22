@@ -35,9 +35,27 @@ public class RussianQuizBot extends TelegramLongPollingBot{
 
         long userId = message.getFrom().getId();
         if(!userSessionHandler.sessionIsActive(userId)){
-            String questionAndAnswer = questionAnswerGenerator.getNewQuestionForUser();
-            userSessionHandler.createUserSession(userId, questionAndAnswer);
+            String questionAndAnswer = questionAnswerGenerator.getNewQuestionAndAnswerForUser();
+
+            String [] questionAndAnswerArray = questionAndAnswer.split("\\|");
+            String question = questionAndAnswerArray[0];
+
+
+            userSessionHandler.createUserSession(userId, question);
             sendMessage(message, questionAndAnswer);
+        } else if(userSessionHandler.sessionIsActive(userId) && message.getText() != null){
+            String questionAndAnswer = userSessionHandler.getQuestionAndAnswerFromDB(userId);
+
+            String [] questionAndAnswerArray = questionAndAnswer.split("\\|");
+            String answer = questionAndAnswerArray[1];
+
+            if(answer.contains(message.getText())){
+                sendMessage(message, "Поздравляю! Ответ правильный!");
+                userSessionHandler.deleteUserSession(userId);
+            } else{
+                sendMessage(message, "Неверный ответ! Попробуете еще?");
+                userSessionHandler.deleteUserSession(userId);
+            }
         }
 
     }
