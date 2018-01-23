@@ -61,6 +61,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
     }
 
     /**
+     *
      * Send text constructed by Bot to user who's asking.
      *
      * @param message
