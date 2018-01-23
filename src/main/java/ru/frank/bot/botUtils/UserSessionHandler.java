@@ -38,6 +38,11 @@ public class UserSessionHandler {
         return sb.toString();
     }
 
+    public String getAnswerFromSession(long userId){
+        UserSession userSession = userSessionDao.get(userId);
+        return userSession.getAnswer();
+    }
+
     public void deleteUserSession(long userId){
         userSessionDao.delete(userSessionDao.get(userId));
     }
