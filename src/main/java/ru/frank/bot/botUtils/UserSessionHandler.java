@@ -6,6 +6,7 @@ import ru.frank.dataBaseUtil.UserSessionDao;
 import ru.frank.model.UserSession;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @Component
@@ -13,6 +14,8 @@ public class UserSessionHandler {
 
     @Autowired
     UserSessionDao userSessionDao;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy MM dd HH:mm:ss");
 
     public boolean sessionIsActive(Long userId){
         if(userSessionDao.get(userId) == null){
@@ -47,6 +50,21 @@ public class UserSessionHandler {
         userSessionDao.delete(userSessionDao.get(userId));
     }
 
+    private String getDateFromSession(long userId){
+        UserSession userSession = userSessionDao.get(userId);
+        return userSession.getStartTime();
+    }
+
+    public boolean validateDate(Date currentDate, long userId) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+        String currentDateString = dateFormat.format(currentDate);
+        String dateFromSession = getDateFromSession(userId);
+
+//        if(currentDate.equals(dateFromSession))
+//    }
+        return false;
+
+    }
 
 
 
