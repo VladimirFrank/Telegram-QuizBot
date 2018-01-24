@@ -2,6 +2,7 @@ import org.junit.Test;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -13,7 +14,7 @@ public class DateTest {
     @Test
     public void testDateValidator(){
 
-        LocalDate nowDate = LocalDate.now();
+        LocalDateTime nowDate = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy MM dd HH:mm:ss");
 
         String nowDateString = nowDate.format(formatter);
