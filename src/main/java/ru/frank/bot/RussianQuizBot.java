@@ -12,6 +12,7 @@ import ru.frank.bot.botUtils.UserSessionHandler;
 import ru.frank.model.QuestionAndAnswer;
 
 import javax.persistence.Column;
+import java.time.LocalDateTime;
 
 /**
  * Created by sbt-filippov-vv on 17.01.2018.
@@ -48,11 +49,21 @@ public class RussianQuizBot extends TelegramLongPollingBot{
 
             String userAnswer = message.getText().toLowerCase();
 
-            if(rightAnswer.contains(userAnswer)){
-                sendMessage(message, "Поздравляю! Ответ правильный!");
-                userSessionHandler.deleteUserSession(userId);
+            LocalDateTime currentDate = LocalDateTime.now();
+
+            if(userSessionHandler.validateDate(currentDate, userId)){
+                if(rightAnswer.contains(userAnswer)){
+                    sendMessage(message, "Поздравляю! Ответ правильный!");
+                    userSessionHandler.deleteUserSession(userId);
+                } else{
+                    sendMessage(message, "Неверный ответ! Попробуйте еще раз.");
+                    userSessionHandler.deleteUserSession(userId);
+                }
+
+                // Сообщение по истчению 20 секунд, отведенных на сессию пользователя.
+                // При этом удаляется запись в БД.
             } else{
-                sendMessage(message, "Неверный ответ! Попробуете еще?");
+                sendMessage(message, "Время на ответ вышло.");
                 userSessionHandler.deleteUserSession(userId);
             }
         }

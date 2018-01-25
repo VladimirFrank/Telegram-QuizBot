@@ -6,6 +6,7 @@ import ru.frank.dataBaseUtil.UserSessionDao;
 import ru.frank.model.UserSession;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -29,9 +30,8 @@ public class UserSessionHandler {
         String [] questionAndAnswerArray = questionAndAnswer.split("\\|");
         String question = questionAndAnswerArray[0];
         String answer = questionAndAnswerArray[1];
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-        userSessionDao.save(new UserSession(userId, dateFormat.format(date), question, answer));
+        LocalDateTime dateTime = LocalDateTime.now();
+        userSessionDao.save(new UserSession(userId, dateTime.format(formatter), question, answer));
     }
 
     public String getQuestionAndAnswerFromDB(long userId){
@@ -55,15 +55,17 @@ public class UserSessionHandler {
         return userSession.getStartTime();
     }
 
-    public boolean validateDate(Date currentDate, long userId) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-        String currentDateString = dateFormat.format(currentDate);
-        String dateFromSession = getDateFromSession(userId);
-
-//        if(currentDate.equals(dateFromSession))
-//    }
-        return false;
-
+    /**
+     * Время для ответа пользователя на вопрос = 20 секунд.
+     * По истечению времени, текущая сессия должна быть удалена и пользователю отправляется сообщение об истечении
+     * времени.
+     * @param currentDate - время получения сообщения с ответом на вопрос от пользователя.
+     * @param userId - id пользователя.
+     * @return true/false.
+     */
+    public boolean validateDate(LocalDateTime currentDate, long userId) {
+        LocalDateTime dateTimeFromSession = LocalDateTime.parse(getDateFromSession(userId), formatter);
+        return currentDate.isBefore(dateTimeFromSession.plusSeconds(20));
     }
 
 
