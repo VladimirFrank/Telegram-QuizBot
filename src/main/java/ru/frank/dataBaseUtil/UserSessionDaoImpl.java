@@ -34,7 +34,7 @@ public class UserSessionDaoImpl implements UserSessionDao {
 
     @Override
     public void update(long id, UserSession userSession) {
-        entityManager.persist(userSession);
+        entityManager.merge(userSession);
     }
 
     @Override
