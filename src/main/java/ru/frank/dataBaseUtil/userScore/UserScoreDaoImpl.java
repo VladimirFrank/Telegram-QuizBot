@@ -33,7 +33,7 @@ public class UserScoreDaoImpl implements UserScoreDao {
     }
 
     @Override
-    public void update(long id, UserScore userScore) {
+    public void update(UserScore userScore) {
         entityManager.merge(userScore);
     }
 }

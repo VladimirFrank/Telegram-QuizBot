@@ -14,5 +14,5 @@ public interface UserScoreDao {
 
     long save(UserScore userScore);
 
-    void update(long id, UserScore userScore);
+    void update(UserScore userScore);
 }

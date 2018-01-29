@@ -8,6 +8,7 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.frank.bot.botUtils.QuestionAnswerGenerator;
+import ru.frank.bot.botUtils.UserScoreHandler;
 import ru.frank.bot.botUtils.UserSessionHandler;
 import ru.frank.model.QuestionAndAnswer;
 
@@ -28,6 +29,9 @@ public class RussianQuizBot extends TelegramLongPollingBot{
 
     @Autowired
     UserSessionHandler userSessionHandler;
+
+    @Autowired
+    UserScoreHandler userScoreHandler;
 
 
     @Override
