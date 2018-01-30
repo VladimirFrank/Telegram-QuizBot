@@ -8,7 +8,7 @@ import ru.frank.model.QuestionAndAnswer;
 /**
  * Класс для получения объекта класса
  * @see QuestionAndAnswer
- * из базы данных. Основной метод: getRandomQuestionAndAnswer возвращает объект QuestionAndAnswer с данными из БД
+ * из таблицы базы данных. Основной метод: getRandomQuestionAndAnswer возвращает объект QuestionAndAnswer с данными из БД
  * по случайному id в пределах от 1 до максимального ID в БД.
  */
 
@@ -27,7 +27,7 @@ public class QuestionAnswerGenerator {
     }
 
     /**
-     * Метод для получения случайной записи класса QuestionAndAnswer из БД
+     * Метод для получения случайной записи класса QuestionAndAnswer из таблицы БД
      * @return QuestionAndAnswer object
      */
     private QuestionAndAnswer getRandomQuestionAndAnswer(){
@@ -40,6 +40,14 @@ public class QuestionAnswerGenerator {
         return questionAndAnswer;
     }
 
+    /**
+     * Метод получает случайный объект класса QuestionAndAnswer с помощью
+     * метода getRandomQuestionAndAnswer() и формирует из полей объекта QuestionAndAnswer
+     * строку содержащую вопрос и ответ разделенные символом '|'.
+     * Например: "В каком году началась Первая мировая война?|1914"
+     *
+     * @return String вопрос и ответ разделенные символом '|'.
+     */
     public String getNewQuestionAndAnswerForUser(){
         StringBuilder sb = new StringBuilder();
         QuestionAndAnswer questionAndAnswer = getRandomQuestionAndAnswer();

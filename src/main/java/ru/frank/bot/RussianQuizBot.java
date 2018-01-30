@@ -47,7 +47,16 @@ public class RussianQuizBot extends TelegramLongPollingBot{
             }
 
             if(message.getText().toLowerCase().contains("/score")){
-                sendMessage(message, String.valueOf(userScoreHandler.getUserScoreById(userId)));
+
+                // Проверяем наличие текущего пользователя в таблице БД "score",
+                if(userScoreHandler.userAlreadyInChart(userId)){
+                    // При наличии текущего пользователя в таблице - отправляем счет игры.
+                    sendMessage(message, "Ваш счет: " + String.valueOf(userScoreHandler.getUserScoreById(userId)));
+                } else{
+                    sendMessage(message, "Запись во вашему счету отсутствует, вероятно вы еще не играли в викторину. " +
+                            "Для начала пришлите '/го'.");
+                }
+
             }
 
             // Начало новой викторины.
@@ -59,18 +68,25 @@ public class RussianQuizBot extends TelegramLongPollingBot{
                 String [] questionAndAnswerArray = questionAndAnswer.split("\\|");
                 String question = questionAndAnswerArray[0];
 
-
+                // Создаем сессию с текущим пользователем
                 userSessionHandler.createUserSession(userId, questionAndAnswer);
+
+                // Проверяем наличие текущего пользователя в таблице БД "score",
+                // при отсутствии - добавляем пользователя в таблицу со счетом 0.
+                if(!userScoreHandler.userAlreadyInChart(userId)){
+                    userScoreHandler.addNewUserInChart(userId);
+                }
+
                 sendMessage(message, question);
 
             }
 
         } else if(userSessionHandler.sessionIsActive(userId) && message.getText() != null){
-            // Правильный ответ
+            // Правильный ответ на вопрос викторины
             String rightAnswer = userSessionHandler.getAnswerFromSession(userId).toLowerCase();
-            //
+            // Присланные пользователем ответ
             String userAnswer = message.getText().toLowerCase();
-
+            // Получаем текущее время для валидации сессии пользователя
             LocalDateTime currentDate = LocalDateTime.now();
 
             if(userSessionHandler.validateDate(currentDate, userId)){

@@ -31,6 +31,11 @@ public class QuestionAndAnswerDaoImpl implements QuestionAndAnswerDao{
         return getAll().size();
     }
 
+    /**
+     * Метод возвращает максимальное значение ID из таблицы.
+     * Таблица должна быть отсортированна по колонке ID.
+     * @return long;
+     */
     @Override
     public long getMaximumId() {
         List<QuestionAndAnswer> questionAndAnswersList = getAll();
