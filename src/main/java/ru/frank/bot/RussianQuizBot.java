@@ -10,14 +10,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.frank.bot.botUtils.QuestionAnswerGenerator;
 import ru.frank.bot.botUtils.UserScoreHandler;
 import ru.frank.bot.botUtils.UserSessionHandler;
-import ru.frank.model.QuestionAndAnswer;
-
-import javax.persistence.Column;
 import java.time.LocalDateTime;
-
-/**
- * Created by sbt-filippov-vv on 17.01.2018.
- */
 
 @Component
 public class RussianQuizBot extends TelegramLongPollingBot{
@@ -39,27 +32,57 @@ public class RussianQuizBot extends TelegramLongPollingBot{
         Message message = update.getMessage();
 
         long userId = message.getFrom().getId();
+
+        // Ответ на пустое сообщение.
+        if(message.getText() == null){
+            sendMessage(message, "Для вызова помощи пришлите /help.");
+        }
+
+        // Сессия с написавшем пользователем не активна (нет заданного вопроса викторины).
         if(!userSessionHandler.sessionIsActive(userId)){
-            String questionAndAnswer = questionAnswerGenerator.getNewQuestionAndAnswerForUser();
 
-            String [] questionAndAnswerArray = questionAndAnswer.split("\\|");
-            String question = questionAndAnswerArray[0];
+            if(message.getText().toLowerCase().contains("/help")){
+                sendMessage(message, "Для начала новой выкторины пришлите мне '/го'. Для ответа на один вопрос викторины отведено 20 секунд, " +
+                        "по истечению этого времени, ответ не засчитывается. За правильный ответ засчитывается 1 балл. Для просмотра своего счета пришлите '/score'.");
+            }
+
+            if(message.getText().toLowerCase().contains("/score")){
+                sendMessage(message, String.valueOf(userScoreHandler.getUserScoreById(userId)));
+            }
+
+            // Начало новой викторины.
+            if(message.getText().toLowerCase().contains("/го")){
+
+                // Получаем новый вопрос + ответ из генератора в виде одной строки.
+                String questionAndAnswer = questionAnswerGenerator.getNewQuestionAndAnswerForUser();
+
+                String [] questionAndAnswerArray = questionAndAnswer.split("\\|");
+                String question = questionAndAnswerArray[0];
 
 
-            userSessionHandler.createUserSession(userId, questionAndAnswer);
-            sendMessage(message, question);
+                userSessionHandler.createUserSession(userId, questionAndAnswer);
+                sendMessage(message, question);
+
+            }
+
         } else if(userSessionHandler.sessionIsActive(userId) && message.getText() != null){
+            // Правильный ответ
             String rightAnswer = userSessionHandler.getAnswerFromSession(userId).toLowerCase();
-
+            //
             String userAnswer = message.getText().toLowerCase();
 
             LocalDateTime currentDate = LocalDateTime.now();
 
             if(userSessionHandler.validateDate(currentDate, userId)){
                 if(rightAnswer.contains(userAnswer)){
-                    sendMessage(message, "Поздравляю! Ответ правильный!");
+                    sendMessage(message, "Поздравляю! Ответ правильный! Для начала новой викторины пришлите /го.");
+
+                    // Увеличиваем счет пользователя на 1.
+                    userScoreHandler.incrementUserScore(userId);
+                    // Удаляем текущую сессию пользователя.
                     userSessionHandler.deleteUserSession(userId);
                 } else{
+                    // Неверный ответ, удаляем сессию.
                     sendMessage(message, "Неверный ответ! Попробуйте еще раз.");
                     userSessionHandler.deleteUserSession(userId);
                 }

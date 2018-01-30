@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.TelegramBotsApi;
 import ru.frank.bot.botUtils.QuestionAnswerGenerator;
+import ru.frank.bot.botUtils.UserScoreHandler;
 import ru.frank.bot.botUtils.UserSessionHandler;
 import ru.frank.dataBaseUtil.QuestionAndAnswerDao;
 import ru.frank.dataBaseUtil.QuestionAndAnswerDaoImpl;
@@ -32,6 +33,13 @@ public class ApplicationConfiguration {
     public QuestionAnswerGenerator questionAnswerGenerator(){
         return new QuestionAnswerGenerator();
     }
+
+    @Bean
+    public UserScoreHandler userScoreHandler(){
+        return new UserScoreHandler();
+    }
+
+
 
     @Bean
     public TelegramBotsApi telegramBotsApi(){
