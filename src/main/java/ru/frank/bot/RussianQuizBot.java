@@ -32,6 +32,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
         Message message = update.getMessage();
 
         long userId = message.getFrom().getId();
+        String userName = message.getFrom().getUserName();
 
         // Ответ на пустое сообщение.
         if(message.getText() == null){
@@ -74,7 +75,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
                 // Проверяем наличие текущего пользователя в таблице БД "score",
                 // при отсутствии - добавляем пользователя в таблицу со счетом 0.
                 if(!userScoreHandler.userAlreadyInChart(userId)){
-                    userScoreHandler.addNewUserInChart(userId);
+                    userScoreHandler.addNewUserInChart(userId, userName);
                 }
 
                 sendMessage(message, question);

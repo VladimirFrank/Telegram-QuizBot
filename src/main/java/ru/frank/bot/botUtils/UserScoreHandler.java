@@ -28,8 +28,8 @@ public class UserScoreHandler {
      * Метод добавляет новую запись в таблицу
      * @param userId
      */
-    public void addNewUserInChart(long userId){
-        userScoreDao.save(new UserScore(userId, 0));
+    public void addNewUserInChart(long userId, String userName){
+        userScoreDao.save(new UserScore(userId, userName, 0));
     }
 
     public long incrementUserScore(long userId){
