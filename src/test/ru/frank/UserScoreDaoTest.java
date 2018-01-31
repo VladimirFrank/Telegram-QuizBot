@@ -38,7 +38,7 @@ public class UserScoreDaoTest {
 
     @Test
     public void addUserScore(){
-        UserScore userScore = new UserScore(123, 553);
+        UserScore userScore = new UserScore(123, "Ivan", 553);
         userScoreDao.save(userScore);
     }
 

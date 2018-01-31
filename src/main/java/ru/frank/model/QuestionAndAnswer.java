@@ -4,10 +4,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "questions")
-public class QuestionAndAnswer {
+public class QuestionAndAnswer implements Serializable{
+
+    private static final long serialVersionUID = -1195530129135254095L;
 
     @Id
     @Column(name = "id")

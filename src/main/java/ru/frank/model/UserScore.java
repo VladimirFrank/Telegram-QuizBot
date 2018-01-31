@@ -4,10 +4,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "user_score")
-public class UserScore {
+public class UserScore implements Serializable, Comparable<UserScore>{
+
+    private static final long serialVersionUID = 8933332456626130380L;
 
     @Id
     @Column(name = "id")
@@ -49,5 +52,19 @@ public class UserScore {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    @Override
+    public int compareTo(UserScore userScore) {
+        return (int) (this.score - userScore.getScore());
+    }
+
+    @Override
+    public String toString() {
+        return "UserScore{" +
+                "id=" + id +
+                ", userName='" + userName + '\'' +
+                ", score=" + score +
+                '}';
     }
 }
