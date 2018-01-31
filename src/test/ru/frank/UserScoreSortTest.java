@@ -3,7 +3,6 @@ package frank;
 import org.junit.Before;
 import org.junit.Test;
 import ru.frank.model.UserScore;
-import ru.frank.model.comparators.UserScoreComparator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
