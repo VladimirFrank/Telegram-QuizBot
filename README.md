@@ -21,6 +21,19 @@ Telegram bot with a game of quiz. Java 8, Spring boot, SQLite, Hibernate.
 
 4. Процесс повторяется.
 
+Идеи, пожелания, дальнейшее развитие в issues (https://github.com/VladimirFrank/Telegram-QuizBot/issues).
+
+Stack:
+
+Java 8 
+Spring boot 1.5.9 
+Hibernate 5.x.x
+JUnit 4.12
+Telegram API 3.5
+Maven 3.5
+
+
+
 
 
 
