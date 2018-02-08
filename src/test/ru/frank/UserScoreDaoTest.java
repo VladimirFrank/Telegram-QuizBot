@@ -61,6 +61,14 @@ public class UserScoreDaoTest {
                 "---");
     }
 
+    @Test
+    public void getTopFiveUserScoresTest(){
+        List<UserScore> topFiveUserScoreList = userScoreHandler.getTopFiveUserScore();
+
+        for(UserScore userScore : topFiveUserScoreList){
+            System.out.println(userScore.toString());
+        }
+    }
 
 
 }
