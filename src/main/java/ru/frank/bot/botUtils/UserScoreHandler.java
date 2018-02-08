@@ -3,7 +3,12 @@ package ru.frank.bot.botUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.frank.dataBaseUtil.userScore.UserScoreDao;
+import ru.frank.exceptions.UserScoreListIsEmptyException;
 import ru.frank.model.UserScore;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Класс для обработки событий связанных с чтением, изменением, дополнением

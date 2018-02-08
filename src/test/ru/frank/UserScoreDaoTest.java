@@ -15,10 +15,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import ru.frank.Application;
+import ru.frank.bot.botUtils.UserScoreHandler;
 import ru.frank.dataBaseUtil.userScore.UserScoreDao;
 import ru.frank.dataBaseUtil.userScore.UserScoreDaoImpl;
 import ru.frank.model.UserScore;
 
+import java.util.List;
 
 
 //@ContextConfiguration(classes = Application.class)
@@ -35,6 +37,9 @@ public class UserScoreDaoTest {
 
     @Autowired
     private UserScoreDao userScoreDao;
+
+    @Autowired
+    private UserScoreHandler userScoreHandler;
 
     @Test
     public void addUserScore(){
