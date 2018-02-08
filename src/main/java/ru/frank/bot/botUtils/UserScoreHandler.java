@@ -42,5 +42,32 @@ public class UserScoreHandler {
     public long getUserScoreById(long userId){
         return userScoreDao.get(userId).getScore();
     }
+    
+    /**
+     * ArrayList include top 5 or less UserSco
+     * @return
+     */
+    public List<UserScore> getTopFiveUserScore() {
+        ArrayList<UserScore> userScoreArrayList = new ArrayList<>(userScoreDao.getAll());
+
+        if(userScoreArrayList.isEmpty()){
+            throw new UserScoreListIsEmptyException("User score list is empty.");
+        }
+
+        Collections.sort(userScoreArrayList);
+
+        int userScoreListSize = userScoreArrayList.size();
+
+        List<UserScore> topScoreList;
+
+        if(userScoreListSize < 5){
+            topScoreList = new ArrayList<>(userScoreArrayList.subList(0, userScoreListSize));
+        } else{
+            topScoreList = new ArrayList<>(userScoreArrayList.subList(0, 5));
+        }
+
+        return topScoreList;
+
+    }
 
 }
