@@ -27,6 +27,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
     UserScoreHandler userScoreHandler;
 
 
+    // TODO Сделать красиво (это уродливо), рефакторнуть на разные методы, меньше вложенных if if if.
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
@@ -37,17 +38,20 @@ public class RussianQuizBot extends TelegramLongPollingBot{
         // Ответ на пустое сообщение.
         if(message.getText() == null){
             sendMessage(message, "Для вызова помощи пришлите /help.");
+            return;
         }
+
+        String userMessageText = message.getText().toLowerCase();
 
         // Сессия с написавшем пользователем не активна (нет заданного вопроса викторины).
         if(!userSessionHandler.sessionIsActive(userId)){
 
-            if(message.getText().toLowerCase().contains("/help")){
+            if(userMessageText.contains("/help")){
                 sendMessage(message, "Для начала новой выкторины пришлите мне /go. Для ответа на один вопрос викторины отведено 20 секунд, " +
                         "по истечению этого времени, ответ не засчитывается. За правильный ответ засчитывается 1 балл. Для просмотра своего счета пришлите /score.");
             }
 
-            if(message.getText().toLowerCase().contains("/score")){
+            if(userMessageText.contains("/score")){
 
                 // Проверяем наличие текущего пользователя в таблице БД "score",
                 if(userScoreHandler.userAlreadyInChart(userId)){
@@ -61,7 +65,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
             }
 
             // Начало новой викторины.
-            if(message.getText().toLowerCase().contains("/go")){
+            if(userMessageText.contains("/go")){
 
                 // Получаем новый вопрос + ответ из генератора в виде одной строки.
                 String questionAndAnswer = questionAnswerGenerator.getNewQuestionAndAnswerForUser();
@@ -87,13 +91,13 @@ public class RussianQuizBot extends TelegramLongPollingBot{
         } else if(userSessionHandler.sessionIsActive(userId) && message.getText() != null){
             // Правильный ответ на вопрос викторины
             String rightAnswer = userSessionHandler.getAnswerFromSession(userId).toLowerCase();
-            // Присланные пользователем ответ
-            String userAnswer = message.getText().toLowerCase();
+            // Присланные пользователем ответ содержится в #userMessageText
+
             // Получаем текущее время для валидации сессии пользователя
             LocalDateTime currentDate = LocalDateTime.now();
 
             if(userSessionHandler.validateDate(currentDate, userId)){
-                if(rightAnswer.contains(userAnswer)){
+                if(rightAnswer.contains(userMessageText)){
                     sendMessage(message, "Поздравляю! Ответ правильный! Для начала новой викторины напишите /go.");
 
                     // Увеличиваем счет пользователя на 1.
