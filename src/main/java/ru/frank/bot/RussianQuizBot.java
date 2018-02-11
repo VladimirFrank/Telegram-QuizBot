@@ -5,12 +5,16 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.frank.bot.botUtils.QuestionAnswerGenerator;
 import ru.frank.bot.botUtils.UserScoreHandler;
 import ru.frank.bot.botUtils.UserSessionHandler;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class RussianQuizBot extends TelegramLongPollingBot{
@@ -30,7 +34,23 @@ public class RussianQuizBot extends TelegramLongPollingBot{
     // TODO Сделать красиво (это уродливо), рефакторнуть на разные методы, меньше вложенных if if if.
     @Override
     public void onUpdateReceived(Update update) {
+
         Message message = update.getMessage();
+
+        SendMessage sendMessage = new SendMessage()
+                .setChatId(message.getChatId()).setText("Yolo!");
+
+
+
+        // TODO
+        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+        rowInLine.add(new InlineKeyboardButton().setText("Начать игру").setCallbackData("/go"));
+        rowsInLine.add(rowInLine);
+        markupInline.setKeyboard(rowsInLine);
+
+
 
         long userId = message.getFrom().getId();
         String userName = message.getFrom().getUserName();
@@ -45,6 +65,14 @@ public class RussianQuizBot extends TelegramLongPollingBot{
 
         // Сессия с написавшем пользователем не активна (нет заданного вопроса викторины).
         if(!userSessionHandler.sessionIsActive(userId)){
+
+            sendMessage.setReplyMarkup(markupInline);
+
+            try {
+                execute(sendMessage);
+            } catch (TelegramApiException ex){
+                ex.printStackTrace();
+            }
 
             if(userMessageText.contains("/help")){
                 sendMessage(message, "Для начала новой выкторины пришлите мне /go. Для ответа на один вопрос викторины отведено 20 секунд, " +
