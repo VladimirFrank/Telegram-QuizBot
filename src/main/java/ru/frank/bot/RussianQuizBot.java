@@ -38,18 +38,30 @@ public class RussianQuizBot extends TelegramLongPollingBot{
     @Override
     public void onUpdateReceived(Update update){
 
-        Message message = update.getMessage();
+        Message message = null;
+        SendMessage sendMessage = new SendMessage();
 
-        SendMessage sendMessage = new SendMessage()
-                .setChatId(message.getChatId()).setText("Привет! Выбери действие.");
+        //Текст сообщения от пользователя
+        String userMessageText = null;
 
+        if(update.hasCallbackQuery()){
+            message = update.getCallbackQuery().getMessage();
+            userMessageText = update.getCallbackQuery().getData();
+            sendMessage.setChatId(message.getChatId());
+        }
+
+        if(update.hasMessage()){
+            message = update.getMessage();
+            sendMessage.setChatId(message.getChatId()).setText("Привет! Выбери действие.");
+            userMessageText = message.getText();
+        }
 
         // Данные пользователя
         long userId = message.getFrom().getId();
         String userName = message.getFrom().getUserName();
 
         // Ответ на пустое сообщение.
-        if(message.getText() == null){
+        if(!message.hasText() & !update.hasCallbackQuery()){
             sendMessage.setReplyMarkup(getMainBotMarkup());
 
             try {
@@ -61,8 +73,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
             return;
         }
 
-        //Текст сообщения от пользователя
-        String userMessageText = message.getText().toLowerCase();
+
 
         // Сессия с написавшем пользователем не активна (нет заданного вопроса викторины).
         if(!userSessionHandler.sessionIsActive(userId)){
