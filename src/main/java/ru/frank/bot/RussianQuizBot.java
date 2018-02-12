@@ -51,9 +51,13 @@ public class RussianQuizBot extends TelegramLongPollingBot{
         }
 
         if(update.hasMessage()){
-            message = update.getMessage();
-            sendMessage.setChatId(message.getChatId()).setText("Привет! Выбери действие.");
-            userMessageText = message.getText();
+            long userId = update.getMessage().getFrom().getId();
+            if(!userSessionHandler.sessionIsActive(userId)){
+                message = update.getMessage();
+                sendMessage.setChatId(message.getChatId()).setText("Привет! Выбери действие.");
+                userMessageText = message.getText();
+            }
+
         }
 
         // Данные пользователя
@@ -79,8 +83,11 @@ public class RussianQuizBot extends TelegramLongPollingBot{
         if(!userSessionHandler.sessionIsActive(userId)){
 
             if(userMessageText.contains("/help")){
-                sendMessage(message, "Для начала новой выкторины пришлите мне /go. Для ответа на один вопрос викторины отведено 20 секунд, " +
-                        "по истечению этого времени, ответ не засчитывается. За правильный ответ засчитывается 1 балл. Для просмотра своего счета пришлите /score.");
+                sendMessage(message, "Для начала новой выкторины пришлите мне /go. " +
+                        "Для ответа на один вопрос викторины отведено 20 секунд, " +
+                        "по истечению этого времени, ответ не засчитывается. " +
+                        "За правильный ответ засчитывается 1 балл. " +
+                        "Для просмотра своего счета пришлите /score.");
             }
 
             if(userMessageText.contains("/score")){
@@ -90,7 +97,8 @@ public class RussianQuizBot extends TelegramLongPollingBot{
                     // При наличии текущего пользователя в таблице - отправляем счет игры.
                     sendMessage(message, "Ваш счет: " + String.valueOf(userScoreHandler.getUserScoreById(userId)));
                 } else{
-                    sendMessage(message, "Запись во вашему счету отсутствует, вероятно вы еще не играли в викторину. " +
+                    sendMessage(message, "Запись во вашему счету отсутствует, " +
+                            "вероятно вы еще не играли в викторину. " +
                             "Для начала пришлите /go.");
                 }
 
