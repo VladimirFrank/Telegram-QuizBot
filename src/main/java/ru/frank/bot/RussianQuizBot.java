@@ -3,6 +3,7 @@ package ru.frank.bot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Chat;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -34,56 +35,59 @@ public class RussianQuizBot extends TelegramLongPollingBot{
     UserScoreHandler userScoreHandler;
 
 
-    // TODO Сделать красиво (это уродливо), рефакторнуть на разные методы, меньше вложенных if if if.
+    // TODO Сделать красиво (это уродливо), рефакторнуть на разные методы.
+    // TODO Меньше вложенных if if if.
     @Override
     public void onUpdateReceived(Update update){
 
         Message message = null;
-        SendMessage sendMessage = new SendMessage();
+//        SendMessage sendMessage = new SendMessage();
 
         //Текст сообщения от пользователя
         String userMessageText = null;
+        String userName = null;
 
+        Long userId = null;
+        Long chatId = null;
+
+        Integer messageId = null;
+
+
+
+        // Get text message from user.
+        if(update.hasMessage()){
+            // Answer for empty user's message.
+            if(!update.getMessage().hasText() & !update.hasCallbackQuery()){
+                executeSendMainMenu(update.getMessage().getChatId());
+                return;
+            }
+            message = update.getMessage();
+            userId = message.getFrom().getId().longValue();
+            userName = message.getFrom().getUserName();
+            chatId = message.getChatId();
+//            // TODO Заменить на отдельный метод
+//            sendMessage.setChatId(chatId);
+
+            if(!userSessionHandler.sessionIsActive(userId)){
+                executeSendMainMenu(chatId);
+            }
+
+        }
+
+        // Get pressed button from user.
         if(update.hasCallbackQuery()){
             message = update.getCallbackQuery().getMessage();
             userMessageText = update.getCallbackQuery().getData();
-            sendMessage.setChatId(message.getChatId());
+            chatId = message.getChatId();
+            userId = update.getCallbackQuery().getFrom().getId().longValue();
+            messageId = message.getMessageId();
         }
-
-        if(update.hasMessage()){
-            long userId = update.getMessage().getFrom().getId();
-            if(!userSessionHandler.sessionIsActive(userId)){
-                message = update.getMessage();
-                sendMessage.setChatId(message.getChatId()).setText("Привет! Выбери действие.");
-                userMessageText = message.getText();
-            }
-
-        }
-
-        // Данные пользователя
-        long userId = message.getFrom().getId();
-        String userName = message.getFrom().getUserName();
-
-        // Ответ на пустое сообщение.
-        if(!message.hasText() & !update.hasCallbackQuery()){
-            sendMessage.setReplyMarkup(getMainBotMarkup());
-
-            try {
-                execute(sendMessage);
-            } catch (TelegramApiException ex){
-                ex.printStackTrace();
-            }
-
-            return;
-        }
-
-
 
         // Сессия с написавшем пользователем не активна (нет заданного вопроса викторины).
-        if(!userSessionHandler.sessionIsActive(userId)){
+        if(!userSessionHandler.sessionIsActive(userId) && userMessageText != null){
 
             if(userMessageText.contains("/help")){
-                sendMessage(message, "Для начала новой выкторины пришлите мне /go. " +
+                executeSendTextMessage(chatId, messageId,  "Для начала новой выкторины пришлите мне /go. " +
                         "Для ответа на один вопрос викторины отведено 20 секунд, " +
                         "по истечению этого времени, ответ не засчитывается. " +
                         "За правильный ответ засчитывается 1 балл. " +
@@ -94,12 +98,16 @@ public class RussianQuizBot extends TelegramLongPollingBot{
 
                 // Проверяем наличие текущего пользователя в таблице БД "score",
                 if(userScoreHandler.userAlreadyInChart(userId)){
-                    // При наличии текущего пользователя в таблице - отправляем счет игры.
-                    sendMessage(message, "Ваш счет: " + String.valueOf(userScoreHandler.getUserScoreById(userId)));
+                    executeSendTextMessage(chatId, messageId, "Ваш счет: " + String.valueOf(userScoreHandler.getUserScoreById(userId)));
+//                    // При наличии текущего пользователя в таблице - отправляем счет игры.
+//                    sendMessage(message, "Ваш счет: " + String.valueOf(userScoreHandler.getUserScoreById(userId)));
                 } else{
-                    sendMessage(message, "Запись во вашему счету отсутствует, " +
+                    executeSendTextMessage(chatId, messageId, "Запись во вашему счету отсутствует, " +
                             "вероятно вы еще не играли в викторину. " +
                             "Для начала пришлите /go.");
+//                    sendMessage(message, "Запись во вашему счету отсутствует, " +
+//                            "вероятно вы еще не играли в викторину. " +
+//                            "Для начала пришлите /go.");
                 }
 
 
@@ -110,12 +118,14 @@ public class RussianQuizBot extends TelegramLongPollingBot{
                 String topUsersScoreString = topUsersScoreList.stream()
                         .map(UserScore::getUserName)
                         .collect(Collectors.joining("\n"));
+                executeSendTextMessage(chatId, messageId, topUsersScoreString);
 
-                try {
-                    execute(sendMessage.setText(topUsersScoreString));
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
-                }
+//
+//                try {
+//                    execute(sendMessage.setText(topUsersScoreString));
+//                } catch (TelegramApiException e) {
+//                    e.printStackTrace();
+//                }
 
             }
 
@@ -137,21 +147,16 @@ public class RussianQuizBot extends TelegramLongPollingBot{
                     userScoreHandler.addNewUserInChart(userId, userName);
                 }
 
-                sendMessage(message, question);
+                executeSendTextMessage(chatId, messageId, question);
+                ////sendMessage(message, question);
             // Отвечаем пользователю, если сообщение не содержит явных указаний для бота (default bot's answer)
             } else{
-                sendMessage.setReplyMarkup(getMainBotMarkup());
-
-                try {
-                    execute(sendMessage);
-                } catch (TelegramApiException ex){
-                    ex.printStackTrace();
-                }
+                executeSendMainMenu(chatId);
 
 
             }
 
-        } else if(userSessionHandler.sessionIsActive(userId) && message.getText() != null){
+        } else if(userSessionHandler.sessionIsActive(userId) && userMessageText != null){
             // Правильный ответ на вопрос викторины
             String rightAnswer = userSessionHandler.getAnswerFromSession(userId).toLowerCase();
             // Присланные пользователем ответ содержится в #userMessageText
@@ -161,7 +166,8 @@ public class RussianQuizBot extends TelegramLongPollingBot{
 
             if(userSessionHandler.validateDate(currentDate, userId)){
                 if(rightAnswer.contains(userMessageText)){
-                    sendMessage(message, "Поздравляю! Ответ правильный! Для начала новой викторины напишите /go.");
+                    executeSendTextMessage(chatId, messageId, "Поздравляю! Ответ правильный! Для начала новой викторины напишите /go.");
+//                    sendMessage(message, "Поздравляю! Ответ правильный! Для начала новой викторины напишите /go.");
 
                     // Увеличиваем счет пользователя на 1.
                     userScoreHandler.incrementUserScore(userId);
@@ -169,18 +175,43 @@ public class RussianQuizBot extends TelegramLongPollingBot{
                     userSessionHandler.deleteUserSession(userId);
                 } else{
                     // Неверный ответ, удаляем сессию.
-                    sendMessage(message, "Неверный ответ! Попробуйте еще раз.");
+                    executeSendTextMessage(chatId, messageId, "Неверный ответ! Попробуйте еще раз.");
                     userSessionHandler.deleteUserSession(userId);
                 }
 
                 // Сообщение по истчению 20 секунд, отведенных на сессию пользователя.
                 // При этом удаляется запись в БД.
             } else{
-                sendMessage(message, "Время на ответ вышло.");
+                executeSendTextMessage(chatId, messageId, "Время на ответ вышло.");
+//                sendMessage(message, "Время на ответ вышло.");
                 userSessionHandler.deleteUserSession(userId);
             }
         }
 
+    }
+
+    private void executeSendMainMenu(Long chatId){
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Выбери команду");
+        sendMessage.setReplyMarkup(getMainBotMarkup());
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void executeSendTextMessage(Long chatId, Integer messageId, String text){
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setReplyToMessageId(messageId);
+        sendMessage.setText(text);
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -190,12 +221,18 @@ public class RussianQuizBot extends TelegramLongPollingBot{
     private InlineKeyboardMarkup getMainBotMarkup(){
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
-        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
-        rowInLine.add(new InlineKeyboardButton().setText("Начать игру").setCallbackData("/go"));
-        rowInLine.add(new InlineKeyboardButton().setText("Мой счет").setCallbackData("/score"));
-        rowInLine.add(new InlineKeyboardButton().setText("Топ 10").setCallbackData("/top10"));
-        rowInLine.add(new InlineKeyboardButton().setText("Помощь").setCallbackData("/help"));
-        rowsInLine.add(rowInLine);
+        List<InlineKeyboardButton> firstRow = new ArrayList<>();
+        List<InlineKeyboardButton> secondRow = new ArrayList<>();
+        List<InlineKeyboardButton> thirdRow = new ArrayList<>();
+        List<InlineKeyboardButton> fourthRow = new ArrayList<>();
+        firstRow.add(new InlineKeyboardButton().setText("Начать игру").setCallbackData("/go"));
+        secondRow.add(new InlineKeyboardButton().setText("Мой счет").setCallbackData("/score"));
+        thirdRow.add(new InlineKeyboardButton().setText("Топ 10").setCallbackData("/top10"));
+        fourthRow.add(new InlineKeyboardButton().setText("Помощь").setCallbackData("/help"));
+        rowsInLine.add(firstRow);
+        rowsInLine.add(secondRow);
+        rowsInLine.add(thirdRow);
+        rowsInLine.add(fourthRow);
         markupInline.setKeyboard(rowsInLine);
         return markupInline;
     }
@@ -207,6 +244,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
      * @param message
      * @param text
      */
+    @Deprecated
     private void sendMessage(Message message, String text){
         // Temporary verification
         // TODO Replace verification to finding method
