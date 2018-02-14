@@ -50,10 +50,6 @@ public class RussianQuizBot extends TelegramLongPollingBot{
         Long userId = null;
         Long chatId = null;
 
-        Integer messageId = null;
-
-
-
         // Get text message from user.
         if(update.hasMessage()){
             // Answer for empty user's message.
@@ -65,6 +61,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
             userId = message.getFrom().getId().longValue();
             userName = message.getFrom().getUserName();
             chatId = message.getChatId();
+            userMessageText = message.getText().toLowerCase();
 //            // TODO Заменить на отдельный метод
 //            sendMessage.setChatId(chatId);
 
@@ -80,14 +77,13 @@ public class RussianQuizBot extends TelegramLongPollingBot{
             userMessageText = update.getCallbackQuery().getData();
             chatId = message.getChatId();
             userId = update.getCallbackQuery().getFrom().getId().longValue();
-            messageId = message.getMessageId();
         }
 
         // Сессия с написавшем пользователем не активна (нет заданного вопроса викторины).
         if(!userSessionHandler.sessionIsActive(userId) && userMessageText != null){
 
             if(userMessageText.contains("/help")){
-                executeSendTextMessage(chatId, messageId,  "Для начала новой выкторины пришлите мне /go. " +
+                executeSendTextMessage(chatId, "Для начала новой выкторины пришлите мне /go. " +
                         "Для ответа на один вопрос викторины отведено 20 секунд, " +
                         "по истечению этого времени, ответ не засчитывается. " +
                         "За правильный ответ засчитывается 1 балл. " +
@@ -98,11 +94,11 @@ public class RussianQuizBot extends TelegramLongPollingBot{
 
                 // Проверяем наличие текущего пользователя в таблице БД "score",
                 if(userScoreHandler.userAlreadyInChart(userId)){
-                    executeSendTextMessage(chatId, messageId, "Ваш счет: " + String.valueOf(userScoreHandler.getUserScoreById(userId)));
+                    executeSendTextMessage(chatId, "Ваш счет: " + String.valueOf(userScoreHandler.getUserScoreById(userId)));
 //                    // При наличии текущего пользователя в таблице - отправляем счет игры.
 //                    sendMessage(message, "Ваш счет: " + String.valueOf(userScoreHandler.getUserScoreById(userId)));
                 } else{
-                    executeSendTextMessage(chatId, messageId, "Запись во вашему счету отсутствует, " +
+                    executeSendTextMessage(chatId, "Запись во вашему счету отсутствует, " +
                             "вероятно вы еще не играли в викторину. " +
                             "Для начала пришлите /go.");
 //                    sendMessage(message, "Запись во вашему счету отсутствует, " +
@@ -118,7 +114,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
                 String topUsersScoreString = topUsersScoreList.stream()
                         .map(UserScore::getUserName)
                         .collect(Collectors.joining("\n"));
-                executeSendTextMessage(chatId, messageId, topUsersScoreString);
+                executeSendTextMessage(chatId, topUsersScoreString);
 
 //
 //                try {
@@ -147,7 +143,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
                     userScoreHandler.addNewUserInChart(userId, userName);
                 }
 
-                executeSendTextMessage(chatId, messageId, question);
+                executeSendTextMessage(chatId, question);
                 ////sendMessage(message, question);
             // Отвечаем пользователю, если сообщение не содержит явных указаний для бота (default bot's answer)
             } else{
@@ -166,7 +162,7 @@ public class RussianQuizBot extends TelegramLongPollingBot{
 
             if(userSessionHandler.validateDate(currentDate, userId)){
                 if(rightAnswer.contains(userMessageText)){
-                    executeSendTextMessage(chatId, messageId, "Поздравляю! Ответ правильный! Для начала новой викторины напишите /go.");
+                    executeSendTextMessage(chatId, "Поздравляю! Ответ правильный! Для начала новой викторины напишите /go.");
 //                    sendMessage(message, "Поздравляю! Ответ правильный! Для начала новой викторины напишите /go.");
 
                     // Увеличиваем счет пользователя на 1.
@@ -175,14 +171,14 @@ public class RussianQuizBot extends TelegramLongPollingBot{
                     userSessionHandler.deleteUserSession(userId);
                 } else{
                     // Неверный ответ, удаляем сессию.
-                    executeSendTextMessage(chatId, messageId, "Неверный ответ! Попробуйте еще раз.");
+                    executeSendTextMessage(chatId, "Неверный ответ! Попробуйте еще раз.");
                     userSessionHandler.deleteUserSession(userId);
                 }
 
                 // Сообщение по истчению 20 секунд, отведенных на сессию пользователя.
                 // При этом удаляется запись в БД.
             } else{
-                executeSendTextMessage(chatId, messageId, "Время на ответ вышло.");
+                executeSendTextMessage(chatId, "Время на ответ вышло.");
 //                sendMessage(message, "Время на ответ вышло.");
                 userSessionHandler.deleteUserSession(userId);
             }
@@ -202,10 +198,9 @@ public class RussianQuizBot extends TelegramLongPollingBot{
         }
     }
 
-    private void executeSendTextMessage(Long chatId, Integer messageId, String text){
+    private void executeSendTextMessage(Long chatId, String text){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        sendMessage.setReplyToMessageId(messageId);
         sendMessage.setText(text);
         try {
             execute(sendMessage);
