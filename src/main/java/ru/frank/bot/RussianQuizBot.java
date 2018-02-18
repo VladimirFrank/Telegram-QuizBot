@@ -41,7 +41,6 @@ public class RussianQuizBot extends TelegramLongPollingBot{
     public void onUpdateReceived(Update update){
 
         Message message = null;
-//        SendMessage sendMessage = new SendMessage();
 
         //Текст сообщения от пользователя
         String userMessageText = null;
@@ -146,11 +145,10 @@ public class RussianQuizBot extends TelegramLongPollingBot{
                 executeSendTextMessage(chatId, question);
                 ////sendMessage(message, question);
             // Отвечаем пользователю, если сообщение не содержит явных указаний для бота (default bot's answer)
-            } else{
-                executeSendMainMenu(chatId);
-
-
             }
+            //else{
+            //    executeSendMainMenu(chatId);
+            //}
 
         } else if(userSessionHandler.sessionIsActive(userId) && userMessageText != null){
             // Правильный ответ на вопрос викторины
